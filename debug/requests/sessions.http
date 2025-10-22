@@ -1,0 +1,32 @@
+### Lock Station
+POST http://localhost:49152/api/sessions/lock
+Content-Type: application/json
+
+{
+  "StationID": "Station-69"
+}
+### Unlock Station for 10 Seconds
+POST http://localhost:49152/api/sessions/unlock
+Content-Type: application/json
+
+{
+  "StationID": "Station-69",
+  "duration": 10000
+}
+
+### Unlock Station for 1 Hour
+POST http://localhost:49152/api/sessions/unlock
+Content-Type: application/json
+
+{
+  "StationID": "Station-69",
+  "duration": 3600000
+}
+### Unlock Station Indefinitely
+POST http://localhost:49152/api/sessions/unlock
+Content-Type: application/json
+
+{
+  "StationID": "Station-69",
+  "duration": 0
+}

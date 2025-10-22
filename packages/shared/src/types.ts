@@ -1,0 +1,1 @@
+type StationStatus = "vacant" | "occupied" | "cleaning"
