@@ -7,12 +7,54 @@ window.electronAPI.onSetStationId((values) => {
     stationIdElement.innerText = `Station ID: ${StationID}`
     connectToServer(values.ServerIP);
 });
+window.onload = () => {
+    document.addEventListener('keydown', (event: KeyboardEvent) => {
+        if (event.key.length > 1 && !event.ctrlKey && !event.altKey && !event.metaKey) event.preventDefault();
+        if (event.key === 'F10') {
+            const overrideModal = document.getElementById("override-login") as HTMLDivElement;
+            if (overrideModal.style.display === 'none') {
+                overrideModal.style.display = "flex"
+                const passwordInput = document.getElementById("password") as HTMLInputElement;
+                passwordInput.focus();
+            } else if (overrideModal.style.display === 'flex') {
+                overrideModal.style.display = "none"
+            }
+        } else if (event.key === 'Escape') {
+            const overrideModal = document.getElementById("override-login") as HTMLDivElement;
+            overrideModal.style.display = "none"
+
+        }
+    })
+    const passwordInput = document.getElementById("password") as HTMLInputElement;
+    passwordInput.addEventListener('keydown', (event: KeyboardEvent) => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            if (passwordInput.value === 'password') {
+                // @ts-ignore
+                window.electronAPI.hideLockScreen()
+                passwordInput.value = '';
+                // @ts-ignore
+                window.electronAPI.debugTrayIcon()
+                const overrideModal = document.getElementById("override-login") as HTMLDivElement;
+                overrideModal.style.display = "none"
+            }
+        }
+    })
+}
 
 function connectToServer(ip: string) {
     const ws = new WebSocket(`ws://${ip}:49152`)
     ws.onopen = () => {
         console.log("Connected to server")
         ws.send(JSON.stringify({type: "identify", StationID: StationID}))
+        // @ts-ignore
+        window.electronAPI.onTrayIcon((type: string) => {
+            switch (type) {
+                case "ra":
+                    ws.send(JSON.stringify({type: "assistance", StationID: StationID}))
+                    break;
+            }
+        })
     }
     ws.onmessage = (e) => {
         const message = JSON.parse(e.data)
@@ -41,7 +83,7 @@ function connectToServer(ip: string) {
     }
     ws.onclose = (e) => {
         console.log("Disconnected from server")
-        setTimeout(connectToServer, 1000)
+        setTimeout(() => connectToServer(ip), 1000)
     }
     ws.onerror = (error) => {
         console.error(error)

@@ -1,4 +1,4 @@
-import {app, BrowserWindow, ipcMain} from 'electron'
+import {app, BrowserWindow, ipcMain, Menu, Tray} from 'electron'
 
 let stationID = ''
 let stationDefined = false
@@ -29,6 +29,7 @@ if (!IPDefined) {
 
 let lockScreenWindow: BrowserWindow | null;
 let timerWidget: BrowserWindow | null;
+let trayIcon: Tray | null;
 
 function createLockScreen() {
     lockScreenWindow = new BrowserWindow({ fullscreen: true, frame: false, closable: false, webPreferences: { preload: `${__dirname}/preload.js`, nodeIntegration: true } });
@@ -52,9 +53,21 @@ function createTimerWidget() {
     });
 }
 
+function createTrayIcon() {
+    trayIcon = new Tray(__dirname + '/assets/temp_icon.png')
+    const contextMenu = Menu.buildFromTemplate([
+        { label: "Request Assistance", type: 'normal' }
+    ])
+    contextMenu.items[0].click = (event: any) => {
+        lockScreenWindow?.webContents.send('on-tray-icon', "ra")
+    }
+    trayIcon.setContextMenu(contextMenu)
+}
+
 app.whenReady().then(() => {
     createLockScreen()
     createTimerWidget()
+    createTrayIcon()
 })
 
 ipcMain.on('hide-lock-screen', () => {
@@ -76,3 +89,15 @@ ipcMain.on('set-overlay-visibility', (event: any, isVisible: boolean) => {
 ipcMain.on('set-timer', (event: any, timeString: string) => {
     timerWidget?.webContents.send('set-time', timeString);
 });
+
+ipcMain.on('debug-tray-icon', (event: any) => {
+    const tray = new Tray(__dirname + '/assets/debug.png')
+    const contextMenu = Menu.buildFromTemplate([
+        { label: "Disable Override", type: 'normal' }
+    ])
+    contextMenu.items[0].click = (event: any) => {
+        lockScreenWindow?.show()
+        tray.destroy()
+    }
+    tray.setContextMenu(contextMenu)
+})

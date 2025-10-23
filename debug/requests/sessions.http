@@ -3,14 +3,14 @@ POST http://localhost:49152/api/sessions/lock
 Content-Type: application/json
 
 {
-  "StationID": "Station-69"
+  "StationID": "DEBUG-STATION-1"
 }
 ### Unlock Station for 10 Seconds
 POST http://localhost:49152/api/sessions/unlock
 Content-Type: application/json
 
 {
-  "StationID": "Station-69",
+  "StationID": "DEBUG-STATION-1",
   "duration": 10000
 }
 
@@ -19,7 +19,7 @@ POST http://localhost:49152/api/sessions/unlock
 Content-Type: application/json
 
 {
-  "StationID": "Station-69",
+  "StationID": "DEBUG-STATION-1",
   "duration": 3600000
 }
 ### Unlock Station Indefinitely
@@ -27,6 +27,6 @@ POST http://localhost:49152/api/sessions/unlock
 Content-Type: application/json
 
 {
-  "StationID": "Station-69",
+  "StationID": "DEBUG-STATION-1",
   "duration": 0
 }

@@ -9,7 +9,6 @@
     "outDir": "dist"
   },
   "include": [
-    "src",
-    "../shared/src/types.ts"
+    "src"
   ]
 }
