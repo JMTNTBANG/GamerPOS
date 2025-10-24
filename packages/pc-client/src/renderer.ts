@@ -1,10 +1,10 @@
-let StationID = 'unknown'
+let hostname: string | null = null
 
 // @ts-ignore
-window.electronAPI.onSetStationId((values) => {
-    StationID = values.StationID;
+window.electronAPI.onServerInfo((values) => {
+    hostname = values.hostname;
     const stationIdElement = document.getElementById("stationId") as HTMLHeadingElement
-    stationIdElement.innerText = `Station ID: ${StationID}`
+    stationIdElement.innerText = `Station ID: ${hostname}`
     connectToServer(values.ServerIP);
 });
 window.onload = () => {
@@ -46,12 +46,12 @@ function connectToServer(ip: string) {
     const ws = new WebSocket(`ws://${ip}:49152`)
     ws.onopen = () => {
         console.log("Connected to server")
-        ws.send(JSON.stringify({type: "identify", StationID: StationID}))
+        ws.send(JSON.stringify({type: "identify-pc", hostname: hostname}))
         // @ts-ignore
         window.electronAPI.onTrayIcon((type: string) => {
             switch (type) {
                 case "ra":
-                    ws.send(JSON.stringify({type: "assistance", StationID: StationID}))
+                    ws.send(JSON.stringify({type: "assistance", hostname: hostname}))
                     break;
             }
         })

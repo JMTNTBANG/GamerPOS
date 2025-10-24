@@ -1,7 +1,7 @@
 {
-  "name": "shared",
+  "name": "pos-client",
   "version": "0.2.0",
-  "main": "index.js",
+  "main": "src/main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -9,9 +9,7 @@
   "license": "GPL-3.0",
   "description": "",
   "dependencies": {
-    "ws": "^8.18.3"
-  },
-  "devDependencies": {
-    "@types/ws": "^8.18.1"
+    "electron": "^38.4.0",
+    "typescript": "^5.9.3"
   }
 }

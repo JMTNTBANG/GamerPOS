@@ -1,27 +1,17 @@
 import {app, BrowserWindow, ipcMain, Menu, Tray} from 'electron'
+import {hostname} from "node:os";
 
-let stationID = ''
-let stationDefined = false
 let serverIP = ""
 let IPDefined = false
 
 for (let arg of process.argv) {
-    if (arg.startsWith('-sid=')) {
-        const definedStation = arg.substring(5)
-        if (definedStation !== "") {
-            stationDefined = true
-            stationID = definedStation
-        }
-    } else if (arg.startsWith('-ip=')) {
+    if (arg.startsWith('-ip=')) {
         const definedIP = arg.substring(4)
         if (definedIP !== "") {
             IPDefined = true
             serverIP = definedIP
         }
     }
-}
-if (!stationDefined) {
-    process.exit("Please Define a Station ID using \"-sid=\"")
 }
 if (!IPDefined) {
     process.exit("Please Define an IP using \"-ip=\"")
@@ -36,7 +26,7 @@ function createLockScreen() {
     lockScreenWindow.setAlwaysOnTop(true, 'normal');
     lockScreenWindow.loadFile("./src/index.html")
     lockScreenWindow.webContents.on('did-finish-load', () => {
-        lockScreenWindow?.webContents.send('set-station-id', {StationID: stationID, ServerIP: serverIP});
+        lockScreenWindow?.webContents.send('server-info', {hostname: hostname(), ServerIP: serverIP});
     });
     lockScreenWindow.on('close', (event: any) => {
         event.preventDefault();

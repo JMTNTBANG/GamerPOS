@@ -1,0 +1,111 @@
+<title>GamerPOS</title>
+<script src="renderer.js"></script>
+<style>
+    body {
+        font-family: "Roboto", sans-serif;
+    }
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    #spinner {
+        border: 16px solid #f3f3f3; /* Light grey */
+        border-top: 16px solid #7f7fff;
+        border-bottom: 16px solid #7f7fff;
+        border-radius: 50%;
+        width: 120px;
+        height: 120px;
+        animation: spin 2s linear infinite;
+    }
+    .cleaning {
+        background-color: rgba(0, 0, 255, 0.5);
+    }
+    .cleaning:active {
+        background-color: rgba(0, 0, 127, 0.5);
+    }
+    .modal {
+        align-items: center;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        height: 100%;
+        justify-content: center;
+        left: 0;
+        position: fixed;
+        top: 0;
+        width: 100%;
+    }
+    .modalBox {
+        text-align: center; background-color: white; width: 300px; height: 150px;
+    }
+    .occupied {
+        background-color: rgba(255, 0, 0, 0.5);
+    }
+    .occupied:active {
+        background-color: rgba(127, 0, 0, 0.5);
+    }
+    .stationButton {
+        border-radius: 20px;
+        height: 150px;
+        width: 150px;
+    }
+    .tabButton {
+        background-color: lightgray;
+        border-radius: 10px;
+        outline: none;
+        padding: 20px;
+    }
+    .tabButton:hover, .active {
+        background-color: lightblue;
+        color: black;
+    }
+    .tab {
+        display: none;
+        height: 100%;
+        left: 0;
+        padding: 10px;
+        position: fixed;
+        width: 100%;
+    }
+    .vacant {
+        background-color: rgba(0, 255, 0, 0.5);
+    }
+    .vacant:active {
+        background-color: rgba(0, 127, 0, 0.5);
+    }
+    .attention {
+        background-color: rgba(255, 255, 0, 0.5);
+    }
+    .attention:active {
+        background-color: rgba(127, 127, 0, 0.5);
+    }
+</style>
+<div id="posTabs" class="tabBar">
+    <button id="stationsButton" class="tabButton">Stations</button>
+    <button id="customersButton" class="tabButton">Customers</button>
+    <button id="POSButton" class="tabButton">POS</button>
+</div>
+<hr style="height: 5px; background-color: black;">
+<div id="stationsTab" class="tab"></div>
+<div id="customersTab" class="tab"></div>
+<div id="POSTab" class="tab"></div>
+<div id="sessionDurationModal" class="modal" style="display: none;">
+    <div class="modalBox">
+        <h3>Session Duration</h3>
+        <p>In Minutes. Put 0 for Indefinite</p>
+        <input id="sessionDuration" type="number">
+    </div>
+</div>
+<div id="login" class="modal">
+    <div class="modalBox">
+        <h3>Login</h3>
+        <label for="username">Username: </label>
+        <input id="username" type="text" placeholder="Username">
+        <br>
+        <br>
+        <label for="password">Password: </label>
+        <input id="password" type="password" placeholder="Password">
+    </div>
+</div>
+<div id="loadScreen" class="modal">
+    <span id="spinner"></span>
+</div>
