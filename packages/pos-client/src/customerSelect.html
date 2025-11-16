@@ -1,0 +1,34 @@
+<title>Customer Select</title>
+<script src="customerSelectRenderer.js"></script>
+<style>
+    body {
+        text-align: center;
+        background-color: white;
+        font-family: Roboto, sans-serif;
+        overflow: hidden;
+        margin: 0;
+    }
+    .customerDetails {
+        margin: 5px 0 5px 0; padding: 5px 0 5px 10px; background-color: lightgray; text-align: left;
+    }
+    .customerDetails:hover {
+        background-color: gray;
+    }
+    #resultList {
+        overflow-y: auto;
+        height: 80vh;
+    }
+    #header {
+        height: 20vh
+    }
+    #search {
+        width: 75%
+    }
+</style>
+
+<div id="header" style="padding: 1px">
+    <h3>Customer Select</h3>
+    <input id="search" type="search" placeholder="First Name, Last Name, Phone, or Email">
+    <button id="newCustomer" type="button">New Customer</button>
+</div>
+<div id="resultList"></div>
