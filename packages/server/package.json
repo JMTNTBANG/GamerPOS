@@ -1,6 +1,6 @@
 {
   "name": "server",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -10,6 +10,7 @@
   "license": "GPL-3.0",
   "description": "",
   "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
     "@types/node": "^24.8.1",
     "express": "^5.1.0",
     "ts-node": "^10.9.2",
@@ -19,6 +20,8 @@
   "dependencies": {
     "@types/express": "^5.0.3",
     "@types/typescript": "^0.4.29",
-    "@types/ws": "^8.18.1"
+    "@types/ws": "^8.18.1",
+    "bcrypt": "^6.0.0",
+    "sqlite3": "^5.1.7"
   }
 }

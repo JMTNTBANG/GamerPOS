@@ -3,5 +3,6 @@ CREATE TABLE Products (
     Description VARCHAR(255) NOT NULL,
     Price FLOAT NOT NULL,
     DateCreated DATETIME DEFAULT CURRENT_TIMESTAMP,
-    Author INT FOREIGN KEY REFERENCES Employees(ROWID)
+    Author INT NOT NULL,
+    FOREIGN KEY (Author) REFERENCES Employees(ROWID)
 )

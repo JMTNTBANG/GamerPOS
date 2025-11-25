@@ -5,5 +5,6 @@ CREATE TABLE Customers (
     Email VARCHAR(255) NOT NULL,
     BillingAddress VARCHAR(255) NOT NULL,
     DateCreated DATETIME DEFAULT CURRENT_TIMESTAMP,
-    Author INT FOREIGN KEY REFERENCES Employees(ROWID)
+    Author INT NOT NULL,
+    FOREIGN KEY (Author) REFERENCES Employees(ROWID)
 )

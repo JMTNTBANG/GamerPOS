@@ -1,7 +1,9 @@
 CREATE TABLE Transactions (
-    Customer INT FOREIGN KEY REFERENCES Customers(ROWID),
+    Customer INT NOT NULL,
     POS VARCHAR(255) NOT NULL,
     Station VARCHAR(255) NOT NULL,
     DateCreated DATETIME DEFAULT CURRENT_TIMESTAMP,
-    Author INT FOREIGN KEY REFERENCES Employees(ROWID)
+    Author INT NOT NULL,
+    FOREIGN KEY (Customer) REFERENCES Customers(ROWID),
+    FOREIGN KEY (Author) REFERENCES Employees(ROWID)
 )

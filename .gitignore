@@ -4,3 +4,4 @@ out
 src/*.js
 
 forge.config.js
+packages/server/src/database.sqlite

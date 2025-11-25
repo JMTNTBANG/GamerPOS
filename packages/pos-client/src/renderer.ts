@@ -49,6 +49,7 @@ async function showModal(modal: string) {
 
 const currentTransaction = new Map<number, {sku: string, qty: number, price: number}>();
 let transactionCustomer
+let activeEmployee: Object | string | null
 const testSKUs = new Map<string, {desc: string, price: number}>
 // @ts-ignore
 const testCustomers = new Map<string, {firstName: string, lastName: string, phone: number, email: string, billingAddr: string}>
@@ -112,14 +113,43 @@ const attentionClock = setInterval(() => {
     }
 },1000)
 
+let onAuthReturn: Function = () => {}
+
 function connectToServer(ip: string) {
     const ws = new WebSocket(`ws://${ip}:49152`);
     ws.onopen = async () => {
         console.log('Connected to server')
         ws.send(JSON.stringify({type: "identify-pos", hostname: hostname}))
         const login = await showModal('login')
-        if (!login.auth) return;
-        document.getElementById("loadScreen")!.style.display = 'none';
+        document.getElementById("loadScreen")!.style.display = 'flex';
+        if (login.username && login.password) {
+            ws.send(JSON.stringify({type: "query-database", hostname: hostname, queryType: "auth", username: login.username, password: login.password}))
+            onAuthReturn = (data: any) => {
+                if (data.error && !data.user) {
+                    switch (data.error) {
+                        case "invalidUser":
+                            // @ts-ignore
+                            window.electronAPI.showErrorBox({title: "User not Found", message: ""})
+                            break;
+                        case "invalidPassword":
+                            // @ts-ignore
+                            window.electronAPI.showErrorBox({title: "Password is Incorrect", message: ""})
+                            break;
+                    }
+                    window.location.reload()
+                    return;
+                } else {
+                    activeEmployee = data
+                    document.getElementById("loadScreen")!.style.display = 'none';
+                    onAuthReturn = (data: any) => {}
+                }
+            }
+        } else {
+            // @ts-ignore
+            window.electronAPI.showErrorBox({title: "Invalid Credentials", message: ""})
+            window.location.reload()
+            return;
+        }
     }
     ws.onmessage = (e) => {
         const message = JSON.parse(e.data);
@@ -156,6 +186,9 @@ function connectToServer(ip: string) {
                     button.innerText = station.hostname;
                     stationsTab.appendChild(button);
                 })
+                break;
+            case 'auth-response':
+                onAuthReturn(message)
                 break;
         }
     }
