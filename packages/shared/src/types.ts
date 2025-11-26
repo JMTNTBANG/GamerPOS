@@ -36,10 +36,10 @@ export interface Employee {
     Email: string;
     Phone: string;
     PayRate: number;
-    Role: number; // FK to Roles table
+    Role: number | Role; // FK to Roles table
     Username: string;
     DateCreated: string;
-    Author: number; // FK to Employees
+    Author: number | Employee; // FK to Employees
 }
 
 // Based on products.sql

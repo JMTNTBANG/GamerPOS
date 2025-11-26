@@ -1,7 +1,7 @@
 import express from 'express'
 import * as http from "node:http";
 import {WebSocketServer} from "ws";
-import {POS, Station} from "../../shared/src/types";
+import {Employee, POS, Station} from "../../shared/src/types";
 import sqlite3 from "sqlite3";
 import bcrypt from "bcrypt"
 import * as fs from "node:fs";
@@ -150,9 +150,9 @@ wss.on('connection', (ws) => {
                                 const {username, password} = data
                                 const userData = await new Promise<types.Employee | undefined>((resolve, reject) => {
                                     try {
-                                        db.get('SELECT * FROM Employees WHERE Username = ?', [username], (err, row) => {
-                                            if (err) reject(err)
-                                            resolve(row as unknown as types.Employee)
+                                        db.get('SELECT * FROM Employees WHERE Username = ?', [username], (err, employee: types.Employee) => {
+                                            if (err) reject(err);
+                                            resolve(employee)
                                         })
                                     } catch (e) {
                                         reject(e)
@@ -160,6 +160,17 @@ wss.on('connection', (ws) => {
                                 })
                                 if (userData) {
                                     if (await bcrypt.compare(password, userData.Password)) {
+                                        userData.Password = ""
+                                        userData.Role = await new Promise<types.Role>((resolve, reject) => {
+                                            try {
+                                                db.get('SELECT * FROM Roles WHERE ROWID = ?', [userData.Role], (err, role: types.Role) => {
+                                                    if (err) reject(err);
+                                                    resolve(role)
+                                                })
+                                            } catch (e) {
+                                                reject(e)
+                                            }
+                                        })
                                         pos?.socket.send(JSON.stringify({type: "auth-response", user: userData}))
                                     } else {
                                         pos?.socket.send(JSON.stringify({type: "auth-response", error: "invalidPassword"}))

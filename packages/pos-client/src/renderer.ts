@@ -140,6 +140,7 @@ function connectToServer(ip: string) {
                     return;
                 } else {
                     activeEmployee = data
+                    document.getElementById("employeeLabel")!.innerText = `Active Employee: ${data.user.FirstName} ${data.user.LastName} | ${data.user.Role.Description}`
                     document.getElementById("loadScreen")!.style.display = 'none';
                     onAuthReturn = (data: any) => {}
                 }
