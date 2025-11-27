@@ -40,7 +40,7 @@ ipcMain.on('show-error-box', (event: any, content: { title: string, message: str
 })
 
 // Modals
-ipcMain.on('show-modal', (event: any, modal: string, callback: Function, data: any) => {
+ipcMain.on('show-modal', (event: any, modal: string, data: any = "") => {
     if (!mainWindow || !modal) return {error: "Invalid Modal"};
     let width = 0
     let height = 0
@@ -74,6 +74,7 @@ ipcMain.on('show-modal', (event: any, modal: string, callback: Function, data: a
     child.loadFile(filePath)
     child.once('ready-to-show', () => {
         child.show()
+        child.webContents.send('modal-preload-data', data)
     })
     const modalCallback = (event: any, srcModal: string, data: any) => {
         if (srcModal === modal) mainWindow?.webContents.send('modal-callback', srcModal, data)

@@ -145,7 +145,7 @@ wss.on('connection', (ws) => {
                         break;
                     case 'query-database':
                         switch (data.queryType) {
-                            case "auth": {
+                            case "auth":
                                 pos = poss.get(data.hostname);
                                 const {username, password} = data
                                 const userData = await new Promise<types.Employee | undefined>((resolve, reject) => {
@@ -178,7 +178,22 @@ wss.on('connection', (ws) => {
                                 } else {
                                     pos?.socket.send(JSON.stringify({type: "auth-response", error: "invalidUser"}))
                                 }
-                            }
+                            break;
+                            case "get-customers":
+                                pos = poss.get(data.hostname);
+                                const customerList = await new Promise<Array<types.Customer> | undefined>((resolve, reject) => {
+                                    try {
+                                        let list: types.Customer[]
+                                        db.all('SELECT * FROM Customers', (err, customers: types.Customer[]) => {
+                                            if (err) reject(err);
+                                            resolve(customers)
+                                        })
+                                    } catch (e) {
+                                        reject(e)
+                                    }
+                                })
+                                pos?.socket.send(JSON.stringify({type: "get-customers-response", data: customerList}))
+                                break;
                         }
                 }
             } else {

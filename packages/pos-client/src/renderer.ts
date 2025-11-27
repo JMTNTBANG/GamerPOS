@@ -34,11 +34,11 @@ function calcSaleTotal() {
     totalLabel.innerText = `Sale Total: $${total.toFixed(2)}`
 }
 
-async function showModal(modal: string) {
+async function showModal(modal: string, data: any = "") {
     return new Promise<any>(resolve => {
         document.getElementById("loadScreen")!.style.display = 'flex';
         // @ts-ignore
-        window.electronAPI.showModal(modal)
+        window.electronAPI.showModal(modal, data)
         // @ts-ignore
         window.electronAPI.modalCallback(modal, (data: any) => {
             document.getElementById("loadScreen")!.style.display = 'none';
@@ -52,12 +52,10 @@ let transactionCustomer
 let activeEmployee: Object | string | null
 const testSKUs = new Map<string, {desc: string, price: number}>
 // @ts-ignore
-const testCustomers = new Map<string, {firstName: string, lastName: string, phone: number, email: string, billingAddr: string}>
+const customers = new Map<number, {FirstName: string, LastName: string, Phone: number, Email: string, BillingAddress: string}>
 testSKUs.set("PASSHOURLY", {desc: "Computer Hourly Pass", price: 10})
 testSKUs.set("PASSDAILY", {desc: "Computer Day Pass", price: 30})
 testSKUs.set("PASSMONTHLY", {desc: "Computer Membership", price: 150})
-testCustomers.set("0", {firstName: "John", lastName: "Doe", phone: 5555555555, email: "example@example.com", billingAddr: "555 S 5th Street, Five, FI 55555"})
-testCustomers.set("1", {firstName: "Jane", lastName: "Doe", phone: 5555555555, email: "example@example.com", billingAddr: "555 S 5th Street, Five, FI 55555"})
 
 window.onload = async () => {
     const transaction = new Map<number, {sku: string, desc: string, qty: number, price: number}>
@@ -85,19 +83,6 @@ window.onload = async () => {
             tab!.style.display = 'flex';
         })
     }
-    document.getElementById("setCustomer")?.addEventListener("click", async (e) => {
-        const customer = await showModal("customerSelect")
-        if (customer.key) {
-            transactionCustomer = testCustomers.get(customer.key)
-            if (!transactionCustomer) return;
-            document.querySelector("#name")!.innerHTML = `${transactionCustomer.firstName} ${transactionCustomer.lastName}`
-            document.querySelector("#phoneNumber")!.innerHTML = transactionCustomer.phone.toString()
-            document.querySelector("#email")!.innerHTML = transactionCustomer.email
-            document.querySelector("#address")!.innerHTML = transactionCustomer.billingAddr.split(", ")[0]
-            document.querySelector("#city")!.innerHTML = `${transactionCustomer.billingAddr.split(", ")[1]}, ${transactionCustomer.billingAddr.split(", ")[2]}`
-        }
-    })
-
 }
 
 const attentionClock = setInterval(() => {
@@ -113,7 +98,9 @@ const attentionClock = setInterval(() => {
     }
 },1000)
 
-let onAuthReturn: Function = () => {}
+let onAuthReturn: Function = (data: any) => {}
+let onGetCustomersReturn: Function = (data: any) => {}
+
 
 function connectToServer(ip: string) {
     const ws = new WebSocket(`ws://${ip}:49152`);
@@ -150,6 +137,28 @@ function connectToServer(ip: string) {
             window.electronAPI.showErrorBox({title: "Invalid Credentials", message: ""})
             window.location.reload()
             return;
+        }
+        ws.send(JSON.stringify({type: "query-database", hostname: hostname, queryType: "get-customers"}))
+        onGetCustomersReturn = (data: Array<any>) => {
+            let i = 0
+            customers.clear()
+            data.forEach((item) => {
+                customers.set(i, item)
+                i++
+            })
+            document.getElementById("setCustomer")?.addEventListener("click", async (e) => {
+                const customer = await showModal("customerSelect", customers)
+                if (customer.key !== undefined) {
+                    transactionCustomer = customers.get(customer.key)
+                    if (!transactionCustomer) return;
+                    document.querySelector("#name")!.innerHTML = `${transactionCustomer.FirstName} ${transactionCustomer.LastName}`
+                    document.querySelector("#phoneNumber")!.innerHTML = transactionCustomer.Phone.toString()
+                    document.querySelector("#email")!.innerHTML = transactionCustomer.Email
+                    document.querySelector("#address")!.innerHTML = transactionCustomer.BillingAddress.split(", ")[0]
+                    document.querySelector("#city")!.innerHTML = `${transactionCustomer.BillingAddress.split(", ")[1]}, ${transactionCustomer.BillingAddress.split(", ")[2]}`
+                }
+            })
+
         }
     }
     ws.onmessage = (e) => {
@@ -190,6 +199,9 @@ function connectToServer(ip: string) {
                 break;
             case 'auth-response':
                 onAuthReturn(message)
+                break;
+            case 'get-customers-response':
+                onGetCustomersReturn(message.data)
                 break;
         }
     }
