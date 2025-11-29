@@ -47,18 +47,15 @@ async function showModal(modal: string, data: any = "") {
     })
 }
 
-const currentTransaction = new Map<number, {sku: string, qty: number, price: number}>();
-let transactionCustomer
 let activeEmployee: Object | string | null
-const testSKUs = new Map<string, {desc: string, price: number}>
+let transactionCustomer
+const currentTransaction = new Map<number, {sku: string, qty: number, price: number}>();
+
+const products = new Map<string, {Description: string, Price: number}>
 // @ts-ignore
 const customers = new Map<number, {FirstName: string, LastName: string, Phone: number, Email: string, BillingAddress: string}>
-testSKUs.set("PASSHOURLY", {desc: "Computer Hourly Pass", price: 10})
-testSKUs.set("PASSDAILY", {desc: "Computer Day Pass", price: 30})
-testSKUs.set("PASSMONTHLY", {desc: "Computer Membership", price: 150})
 
 window.onload = async () => {
-    const transaction = new Map<number, {sku: string, desc: string, qty: number, price: number}>
     const tabButtons = document.getElementsByClassName('tabButton') as HTMLCollectionOf<HTMLButtonElement>
     const tabs = document.getElementsByClassName('tab') as HTMLCollectionOf<HTMLDivElement>
     function enableAllButtons () {
@@ -100,7 +97,7 @@ const attentionClock = setInterval(() => {
 
 let onAuthReturn: Function = (data: any) => {}
 let onGetCustomersReturn: Function = (data: any) => {}
-
+let onGetProductsReturn: Function = (data: any) => {}
 
 function connectToServer(ip: string) {
     const ws = new WebSocket(`ws://${ip}:49152`);
@@ -160,6 +157,21 @@ function connectToServer(ip: string) {
             })
 
         }
+        ws.send(JSON.stringify({type: "query-database", hostname: hostname, queryType: "get-products"}))
+        onGetProductsReturn = (data: Array<any>) => {
+            products.clear()
+            data.forEach((item) => {
+                products.set(item.SKU, item)
+            })
+            const skuBox = document.querySelector("#skuBox") as HTMLInputElement
+            skuBox.addEventListener("keydown", async (e) => {
+                if (e.key === "Enter") {
+                    e.preventDefault()
+                    addItem(skuBox.value.toLowerCase())
+                    skuBox.value = ""
+                }
+            })
+        }
     }
     ws.onmessage = (e) => {
         const message = JSON.parse(e.data);
@@ -203,6 +215,9 @@ function connectToServer(ip: string) {
             case 'get-customers-response':
                 onGetCustomersReturn(message.data)
                 break;
+            case 'get-products-response':
+                onGetProductsReturn(message.data)
+                break;
         }
     }
     ws.onclose = (e) => {
@@ -228,7 +243,7 @@ function calcTransactionTotal() {
 
 function addItem(SKU: string) {
     const transactionItemID = transactionItemIDIndex
-    const product = testSKUs.get(SKU)
+    const product = products.get(SKU)
     if (product) {
         const transactionDetails = document.createElement('div')
         const itemDelete = document.createElement('button')
@@ -245,9 +260,9 @@ function addItem(SKU: string) {
         itemQty.classList.add('itemQty')
         itemPrice.classList.add('itemPrice')
         itemDelete.innerHTML = '&#11199;'
-        itemDetails.innerText = product.desc
+        itemDetails.innerText = product.Description
         itemQty.value = "1"
-        itemPrice.value = product.price.toString()
+        itemPrice.value = product.Price.toString()
         transactionDetails.appendChild(itemDelete)
         transactionDetails.appendChild(itemDetails)
         transactionDetails.appendChild(itemQty)

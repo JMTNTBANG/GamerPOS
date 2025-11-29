@@ -181,7 +181,7 @@ wss.on('connection', (ws) => {
                             break;
                             case "get-customers":
                                 pos = poss.get(data.hostname);
-                                const customerList = await new Promise<Array<types.Customer> | undefined>((resolve, reject) => {
+                                const customerList = await new Promise<types.Customer[]>((resolve, reject) => {
                                     try {
                                         let list: types.Customer[]
                                         db.all('SELECT * FROM Customers', (err, customers: types.Customer[]) => {
@@ -193,6 +193,21 @@ wss.on('connection', (ws) => {
                                     }
                                 })
                                 pos?.socket.send(JSON.stringify({type: "get-customers-response", data: customerList}))
+                                break;
+                            case "get-products":
+                                pos = poss.get(data.hostname);
+                                const productList = await new Promise<types.Product[]>((resolve, reject) => {
+                                    try {
+                                        let list: types.Product[]
+                                        db.all('SELECT * FROM Products', (err, products: types.Product[]) => {
+                                            if (err) reject(err);
+                                            resolve(products)
+                                        })
+                                    } catch (e) {
+                                        reject(e)
+                                    }
+                                })
+                                pos?.socket.send(JSON.stringify({type: "get-products-response", data: productList}))
                                 break;
                         }
                 }
