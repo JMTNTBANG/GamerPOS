@@ -22,7 +22,7 @@ let timerWidget: BrowserWindow | null;
 let trayIcon: Tray | null;
 
 function createLockScreen() {
-    lockScreenWindow = new BrowserWindow({ fullscreen: true, frame: false, closable: false, webPreferences: { preload: `${__dirname}/preload.js`, nodeIntegration: true } });
+    lockScreenWindow = new BrowserWindow({ icon: __dirname + '/assets/app-icon.ico', fullscreen: true, frame: false, closable: false, webPreferences: { preload: `${__dirname}/preload.js`, nodeIntegration: true } });
     lockScreenWindow.setAlwaysOnTop(true, 'normal');
     lockScreenWindow.loadFile("./src/index.html")
     lockScreenWindow.webContents.on('did-finish-load', () => {

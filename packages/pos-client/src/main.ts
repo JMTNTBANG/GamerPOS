@@ -22,7 +22,7 @@ if (!IPDefined) {
 let mainWindow: BrowserWindow | null = null;
 
 app.whenReady().then(() => {
-    mainWindow = new BrowserWindow({webPreferences: { preload: `${__dirname}/preload.js`, nodeIntegration: true }})
+    mainWindow = new BrowserWindow({ icon: __dirname + '/assets/app-icon.ico', webPreferences: { preload: `${__dirname}/preload.js`, nodeIntegration: true }})
     mainWindow.setMenuBarVisibility(false)
     mainWindow.loadFile('./src/index.html');
     mainWindow.maximize()
@@ -64,7 +64,7 @@ ipcMain.on('show-modal', (event: any, modal: string, data: any = "") => {
             filePath = "./src/customerSelect.html"
             break
     }
-    const child = new BrowserWindow({parent: mainWindow, modal: true, show: false, width: width, height: height, closable: closable, resizable: false, minimizable: false, maximizable: false, webPreferences: { preload: `${__dirname}/preload.js`, nodeIntegration: true }})
+    const child = new BrowserWindow({icon: __dirname + '/assets/app-icon.ico', parent: mainWindow, modal: true, show: false, width: width, height: height, closable: closable, resizable: false, minimizable: false, maximizable: false, webPreferences: { preload: `${__dirname}/preload.js`, nodeIntegration: true }})
     if (!closable) {
         child.on('close', (event: any) => {
             event.preventDefault();
